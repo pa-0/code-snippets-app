@@ -1,145 +1,132 @@
-# Szkielet aplikacji serwera
+# Server application framework
 
+The server uses Qt5 libraries, a driver for the SQLite3 database and an external qt-based library - [QHTTPEngine](https://github.com/nitroshare/qhttpengine). Its source files are included with the project^1)^ code-snippet-app, so you don't need to download it additionally. The steps necessary to build it from source will be outlined for each platform below.
 
-Serwer wykorzystuje biblioteki Qt5, sterownik do bazy danych SQLite3 oraz zewnętrzną bibliotekę opartą na qt - [QHTTPEngine](https://github.com/nitroshare/qhttpengine). Jej pliki źródłowe są dołączone do projektu<sup>1)</sup> code-snippet-app, nie trzeba więc jej dodatkowo pobierać. Kroki niezbędne do zbudowania jej ze źródeł zostaną przedstawione dla każdej platformy poniżej.
+## Building and running a project on Ubuntu 20.04
 
+### System configuration
 
-## Zbudowanie i uruchomienie projektu na Ubuntu 20.04
+It is assumed that the user has the qt5 libraries installed globally and the driver to support the SQLite3 database.
 
-### Konfiguracja systemu
-
-Zakłada się, że użytkownik ma zainstalowane globalnie biblioteki qt5 oraz sterownik do obsługi bazy danych SQLite3. 
-
-Jeśli nie ma, to może to zrobić tak: 
-
+If there is not, it can do it like this:
 
 `$ sudo apt-get install qt5-default`
 
-
 `$ sudo apt-get install sqlite3`
-  
-### Budowanie i uruchomienie projektu
 
-Budowanie (lokalnie, w folderze z projektem) biblioteki QHTTPEngine:
+### Building and launching a project
 
-  
+Building (locally, in the project folder) the QHTTPEngine library:
 
-1. `$ cd server/lib/qhttpengine`
+1.  `$ cd server/lib/qhttpengine`
+    
+2.  `$ mkdir build && cd ./build`
+    
+3.  `$ cmake ..` - This step may generate an error related to the local installation of the library. You should ignore it and move on.
+    
+4.  `$ make install`
+    
 
-2. `$ mkdir build && cd ./build`
+#### Create a database. Being in the catalog :`server`
 
-3. `$ cmake ..` - ten etap może wygenerować błąd związany z lokalną instalacją biblioteki. Należy go zignorować i iść dalej.
+5.  `$ cd database && ./unix-setup.sh`
 
-4. `$ make install`
+#### Building a project. Being in the catalog :`server`
 
-Tworzenie bazy danych. Będąc w katalogu `server`:
+6.  `$ mkdir build && cd build`
+    
+7.  `$ cmake ..`
+    
+8.  `$ make`
+    
 
-5. `$ cd database && ./unix-setup.sh`
-  
-Budowanie projektu. Będąc w katalogu `server`:
+#### Launch the application. Being in the catalog :`server`
 
+9.  `$ cd bin`
+10.  `$ ./server`
 
-6. `$ mkdir build && cd build`
+#### Running unit tests:
 
-7. `$ cmake ..`
+11.  `$ cd bin`
+12.  `$ ./test`
 
-8. `$ make`
+^1)^ The only change in the source code is changing the variables , , in the CMakeLists.txt file to paths within the application folder (so as not to install the library globally). It can result in examples included in the library not working.`BIN_INSTALL_DIR``LIB_INSTALL_DIR``INCLUDE_INSTALL_DIR`
 
-  
+## Build and build on Windows 10
 
-Uruchomienie aplikacji. Będąc w katalogu `server`:
+### System configuration
 
+It is assumed that the user has the Qt5 libraries, the driver for the SQLite3 database, and the Visual Studio package (tested with Visual Studio 2019) installed globally.
 
-9. `$ cd bin`
-10. `$ ./server`
+#### Installation tips:
 
-Uruchomienie testów jednostkowych:
+-   Qt5 - download and run the online installer from [the Qt website](https://www.qt.io/download-open-source), then follow the instructions to download the latest version 5 subversions of the Qt libraries.
+-   SQLite3 - follow the instructions on the [page](https://www.tutorialspoint.com/sqlite/sqlite_installation.htm).
 
-11. `$ cd bin`
-12. `$ ./test`
+### Building and running a server
 
-<sup>1)</sup> jedyną zmianą w kodzie źródłowym jest zmiana zmiennych `BIN_INSTALL_DIR`, `LIB_INSTALL_DIR`, `INCLUDE_INSTALL_DIR` w pliku CMakeLists.txt na ścieżki w obrębie folderu aplikacji (by nie instalować biblioteki globalnie). Może skutkować brakiem działania dołączonych do biblioteki przykładów (examples).
+#### Download the repository and extract it to the desired folder. In the console (**Developer Command Prompt for VS 2019** or equivalent for another version of Visual Studio), go to the folder with the project, then:
 
-## Zbudowanie i urochomienie na Windows 10
+1.  `> cd server\lib\qhttpengine`
+    
+2.  `> mkdir build`
+    
+3.  `> cmake ..`  - you may need to specify the generator (e.g. option). The list of generators available in the system can be obtained with the command. This step may also generate an error related to the local installation of the library. You should ignore it and move on.`/G "Visual Studio 16 2019"``cmake /help`
+    
+4.  `> msbuild INSTALL.vcxproj`
+    
 
-### Konfiguracja systemu
+#### Creating a database starting in the directory:`code-snippet-app\server\`
 
-Zakłada się, że użytkownik ma zainstalowane globalnie biblioteki Qt5, sterownik do obsługi bazy danych SQLite3, oraz pakiet Visual Studio (testowane z Visual Studio 2019). 
+5.  `> cd database`
+    
+6.  `> .\windows-setup.bat`
+    
 
+#### Building a project starting in the directory :`code-snippet-app\server\`
 
-Wskazówki dotyczące isntalacji:
-* Qt5 - pobrać i uruchomić online installer ze [strony Qt](https://www.qt.io/download-open-source), następnie postępować zgodnie z instrukcjami, by pobrać najnowsze subwersje wersji 5 bibliotek Qt. Po zainstalowaniu może być konieczne dodanie do zmiennej PATH folderu z bibliotekami Qt.
-* SQLite3 - postępować zgodnie z instrukcjami na [stronie](https://www.tutorialspoint.com/sqlite/sqlite_installation.htm).
+7.  `> mkdir build`
+    
+8.  `> cd build`
+    
+9.  `> cmake ..`- you may need to specify the generator (e.g. option). The list of generators available in the system can be obtained with the command.`/G "Visual Studio 16 2019"``cmake /help`
+    
+10.  `> cd ..\src`
+    
+11.  `> windows-after-build-setup.bat`
+    
 
-### Budowanie i uruchomienie serwera
+#### Run:
 
-Pobrać repozytorium i wypakować do wybranego folderu. W konsoli (**Developer Command Prompt for VS 2019** lub adekwatnej dla innej wersji Visual Studio) przejść do folderu z projektem, następnie:
+12.  `> cd bin`
+    
+13.  `> .\server.exe`
+    
 
-1. `> cd server\lib\qhttpengine`
+# Testing
 
-2. `> mkdir build`
+The server listens on port 8000 at (). It accepts queries from body in json format with fields:`app``localhost:8000/app``POST`
 
-3. `> cmake .. `  - może być potrzebne sprecyzowanie generatora (np. opcja `/G "Visual Studio 16 2019"`). Listę dostępnych w systemie generatorów można uzyskać komendą `cmake /help`. Ten etap może też wygenerować błąd związany z lokalną instalacją biblioteki. Należy go zignorować i iść dalej.
+-   `author` - string (e.g. ) max 30 characters`QString`
+-   `title` - string max 100 characters
+-   `created` - class object converted to a number in **Unix time** format with accuracy to the second (`QDateTime``QDateTime::toSecsSinceEpoch()`)
+-   `lang` - one of the language identifier strings allowed by the variable`Snippet::availableLangs_`
+-   `content` - string with a maximum length of 1000 characters
 
-4. `> msbuild INSTALL.vcxproj`
+and queries . You can create queries to search for snippets that match a given pattern according to the following query fields in the URL path:`GET`
 
-Stworzenie bazy danych zaczynając w katalogu `code-snippet-app\server\`:
+-   author_subsequence - string no longer than 30 characters, if empty - any author
+-   title_subsequence - string no longer than 100 characters, if empty - any title
+-   created_from - start date of the search in the same form **Unix time** as above or empty if unspecified
+-   created_to - end date of the search in the same form **Unix time** as above or empty if unspecified
+-   lang - one of the strings identifying the language or an empty string denoting any language
 
-5. `> cd database`
+##### Example: it will search for snippets whose author contains in the name and the programming language is c++.`localhost:8000/app?author_subsequence=usernam&lang=c++``usernam`
 
-6. `> .\windows-setup.bat` 
+The answer to a query without a request to search for specific snippets is a list of up to 5 snippets in json format recently added by queries (formally, these are the objects with the highest id in the database).`GET``POST`
 
-Budowanie projektu zaczynając w katalogu `code-snippet-app\server\`:
+All fields are optional and can be combined as desired.
 
-7. `> mkdir build`
+The result of each valid query is json - a list of snippet objects. It can be empty.`GET`
 
-8. `> cd build`
-
-9. `> cmake ..`- może być potrzebne sprecyzowanie generatora (np. opcja `/G "Visual Studio 16 2019"`). Listę dostępnych w systemie generatorów można uzyskać komendą `cmake /help`.
-
-10. `> cd ..\src`
-
-11. `> windows-after-build-setup.bat`
-
-Uruchomienie:
-
-12. `> cd bin`
-
-13. `> .\server.exe`
-
-# Testowanie
-
-Serwer nasłuchuje na porcie 8000 pod adresem `app` (`localhost:8000/app`). Przyjmuje zapytania `POST` z body w formacie json z polami:
-
-  
-
-* `author` - string (np. `QString`) max 30 znaków
-
-* `title` - string max 100 znaków
-
-* `created` - obiekt klasy `QDateTime` zamieniony na liczbę w formacie **Unix time** z dokładnością co do sekundy (`QDateTime::toSecsSinceEpoch()`)
-
-* `lang` - jeden z dozwolonych przez zmienną `Snippet::availableLangs_` napisów identyfikujących język
-
-* `content` - string o długości max 1000 znaków
-
-  
-
-oraz zapytania `GET`. Można tworzyć zapytania o wyszukanie snippetów pasujących do podanego wzorca według następujących pól zapytania w ścieżce URL: 
-
-* author_subsequence - string nie dłuższy niż 30 znaków, jeśli pusty - dowolny autor
-* title_subsequence - string nie dłuższy niż 100 znaków, jeśli pusty - dowolny tytuł
-* created_from - data poczatku wyszukiwania w tej samej postaci **Unix time** jak wyżej lub puste jeśli niesprecyzowane
-* created_to - data końca wyszukiwania w tej samej postaci **Unix time** jak wyżej lub puste jeśli niesprecyzowane
-* lang - jeden z napisów identyfikujących język lub pusty string oznaczający dowolny język
-
-Przykład: `localhost:8000/app?author_subsequence=usernam&lang=c++` wyszuka snippety, których autor zawiera w nazwie `usernam` a język programowania to c++.
-
-Odpowiedzią na zapytanie typu `GET` bez żądania wyszukania konkretnych snippetów jest lista maksymalnie 5 snippetów w formacie json ostatnio dodanych przez zapytania `POST` (formalnie są to obiekty o najwyższym id w bazie danych). 
-
-Wszystkie pola są opcjonalne i można je dowolnie łączyć.
-
-Wynikiem każdego poprawnego zapytania `GET` jest json - lista obiektów snippet. Może być pusta.
-
-W wyniku niepoprawnego zapytania w sockecie ustawiany jest kod błędu **Bad Request** i w jsonie w polu `"message"` powinien zostać zwrócony odpowiedni komunikat.
-
+As a result of an incorrect query, the error code **Bad Request** is set in the socket and an appropriate message should be returned in the json field.
